@@ -6,16 +6,28 @@ import { Board } from "./components/Board"
 import { TURNS } from "./constants"
 import { checkWinner, checkEndGame } from "./logic/board"
 import { WinnerModal } from "./components/WinnerModal"
+import { saveGameStorage, resetGameStorage } from "./logic/storage"
 
 function App(){
-  const [board, setBoard] = useState(Array(9).fill(null));
-  const [turn, setTurn] = useState(TURNS.X);
-  const [winner, setWinner] = useState(null);
+  //useState Hook ALWAYS in the root of the component
+  const [board, setBoard] = useState(()=>{
+    const boardFromLS = window.localStorage.getItem('board')
+    return JSON.parse(boardFromLS) ?? Array(9).fill(null)
+  });
+
+  const [turn, setTurn] = useState(()=>{
+    const turnFromLS = window.localStorage.getItem('turn')
+    return JSON.parse(turnFromLS) ?? TURNS.X
+  })
+
+  const [winner, setWinner] = useState(null)
   
   const resetGame =()=>{
     setBoard((Array(9).fill(null)))
     setTurn(TURNS.X)
     setWinner(null)
+
+    resetGameStorage()
   }
 
   const updateBoard = (index)=>{
@@ -27,6 +39,11 @@ function App(){
     //new turn
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X;
     setTurn(newTurn);
+    //save on localStorage
+    saveGameStorage({
+      board: newBoard,
+      turn: newTurn
+    })
     //check for winner
     const newWinner = checkWinner(newBoard)
     if(newWinner){
