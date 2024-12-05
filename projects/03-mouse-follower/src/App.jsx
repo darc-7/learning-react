@@ -6,6 +6,7 @@ const FollowMouse = () =>{
   const [position, setPosition] = useState({x: 0, y: 0})
   //initialize a State with the correct type data is good practice
 
+  //pointer move effect
   useEffect(()=>{
     console.log("efecto", {enabled})
 
@@ -18,11 +19,22 @@ const FollowMouse = () =>{
       window.addEventListener('pointermove', handleMove)
     }
 
-    return () => {
+    return () => { //cleanup function
       window.removeEventListener('pointermove', handleMove)
     }
   }, [enabled])
+  // [] -> executes when component is rendered on the DOM
+  // [dependencies] -> executes when component is rendered and when the dependencies changes
+  // undefined -> always executes on rendering
 
+  //change body className
+  useEffect(()=>{
+    document.body.classList.toggle('no-cursor', enabled)
+
+    return () => {
+      document.body.classList.remove('no-cursor')
+    }
+  }, [enabled])
   return (
     <>
       <div style={{
